@@ -2,5 +2,3 @@
 
 const JSONFileName = 'assets/springfield.json';
 
-
-
