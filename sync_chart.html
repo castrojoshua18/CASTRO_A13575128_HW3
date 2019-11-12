@@ -1,0 +1,212 @@
+<html>
+    <head>
+            <script src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js">
+            </script>
+            <script src = "https://code.highcharts.com/highcharts.js"></script>  
+            <script src = "https://code.highcharts.com/modules/data.js"></script>
+    </head>
+
+    <body>
+        <div id = "container" style = "width: 1000px; height: 700px; margin: 0 auto"></div>
+        <script language = "JavaScript"> 
+            ['mouseleave'].forEach(function (eventType) {
+            document.getElementById('sharedGrid').addEventListener(
+                eventType,
+                function (e) {
+                    var chart,
+                        point,
+                        i,
+                        event;
+                    
+                        for (i = 0; i < Highcharts.charts.length; i = i + 1) {
+                            chart = Highcharts.charts[i];
+                            event = chart.pointer.normalize(e);
+                            point = chart.series[0].searchPoint(event, true);
+                            
+                            if (point) {
+                                point.onMouseOut(); 
+                                chart.tooltip.hide(point);
+                                chart.xAxis[0].hideCrosshair(); 
+                            }
+                        }
+                    }
+                )
+            });
+
+            ['mousemove', 'touchmove', 'touchstart'].forEach(function (eventType) {
+                document.getElementById('sharedGrid').addEventListener(
+                    eventType,
+                    function (e) {
+                        var chart,
+                            point,
+                            i,
+                            event;
+
+                        for (i = 0; i < Highcharts.charts.length; i = i + 1) {
+                            chart = Highcharts.charts[i];
+                            // Find coordinates within the chart
+                            event = chart.pointer.normalize(e);
+                            // Get the hovered point
+                            point = chart.series[0].searchPoint(event, true);
+
+                            if (point) {
+                                point.highlight(e);
+                            }
+                        }
+                    }
+                );
+            });
+
+            /**
+            * Highlight a point by showing tooltip, setting hover state and draw crosshair
+            */
+            Highcharts.Point.prototype.highlight = function (event) {
+                event = this.series.chart.pointer.normalize(event);
+                this.onMouseOver(); // Show the hover marker
+                this.series.chart.tooltip.refresh(this); // Show the tooltip
+                this.series.chart.xAxis[0].drawCrosshair(event, this); // Show the crosshair
+                this.series.chart.yAxis[0].drawCrosshair(event, this);
+            };
+
+
+            /**
+            * Synchronize zooming through the setExtremes event handler.
+            */
+            function syncExtremes(e) {
+                var thisChart = this.chart;
+
+                if (e.trigger !== 'syncExtremes') { // Prevent feedback loop
+                    Highcharts.each(Highcharts.charts, function (chart) {
+                        if (chart !== thisChart) {
+                            if (chart.xAxis[0].setExtremes) { // It is null while updating
+                                chart.xAxis[0].setExtremes(
+                                    e.min,
+                                    e.max,
+                                    undefined,
+                                    false,
+                                    { trigger: 'syncExtremes' }
+                                );
+                            }
+                        }
+                    });
+                }
+            }
+
+
+            /* Add this to the xAxis attribute of each chart. */
+                events: {
+                        setExtremes: syncExtremes
+                    }
+            
+            $.getJSON('https://raw.githubusercontent.com/castrojoshua18/CASTRO_A13575128_HW3/master/assets/springfield.json', function (activity) {
+                var chart = {
+                type: 'area'
+                };
+                var title = {
+                text: 'Historic and Estimated Worldwide Population Growth by Region'   
+                }; 
+                var subtitle = {
+                text: 'Source: Wikipedia.org'
+                };
+
+                
+                var xAxis = {
+                    type: 'datetime',
+                    dateTimeLabelFormats: {
+                    day: '%e. %b',
+                    month: '%b \'%y',
+                    },
+                    tickInterval: 86400000/300000/6,
+                title: {
+                    enabled: false
+                }
+                
+
+
+                };
+                var yAxis = {
+                title: {
+                    text: 'Billions'
+                },
+                labels: {
+                    formatter: function () {
+                        return this.value;
+                    }
+                }
+                };
+                var tooltip = {
+                shared: true,
+                valueSuffix: ' millions'
+                };
+                var plotOptions = {
+                area: {
+                    stacking: 'normal',
+                    lineColor: '#666666',
+                    lineWidth: 0,
+                    
+                    marker: {
+                        lineWidth: 1,
+                        lineColor: '#666666'
+                    }
+                }
+                };
+                var credits = {
+                enabled: false
+                };
+                var series = [ //JSON DATA FOR USAGE HERE
+                {
+                    name: "Wind",
+                    pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
+                    pointInterval: 1800000/5,
+                    data: data[5].history.data,
+                    color: 'Green'
+
+                },
+                {
+                    name: "Hydro",
+                    pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
+                    pointInterval: 1800000/5,
+                    data: data[3].history.data,
+                    color: 'Blue'
+                }, 
+                {
+                    name: "Gas (CCGT)",
+                    pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
+                    pointInterval: 1800000/5,
+                    data: data[2].history.data,
+                    color: 'Orange'
+                },
+                {
+                    name: 'Distillate',
+                    pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
+                    pointInterval: 1800000/5,
+                    data: data[1].history.data,
+                    color: 'Red'
+                }, 
+                {
+                    name: "Black Coal",
+                    pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
+                    pointInterval: 1800000/5,
+                    data: data[0].history.data,
+                    color: 'Black'
+                }
+                
+                ];     
+        
+                var areaPower = {};   
+                areaPower.chart = chart; 
+                areaPower.title = title; 
+                areaPower.subtitle = subtitle; 
+                areaPower.xAxis = xAxis;
+                areaPower.yAxis = yAxis;
+                areaPower.tooltip = tooltip;
+                areaPower.plotOptions = plotOptions;
+                areaPower.credits = credits;
+                areaPower.series = series;
+                $('<div class="chart">').appendto('#container').highcharts(json);
+
+            });
+        </script>
+
+    </body>
+</html>

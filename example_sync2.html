@@ -1,0 +1,250 @@
+<html>
+   <head>
+      <title>Highcharts Tutorial</title>
+      <script src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js">
+      </script>
+      <script src = "https://code.highcharts.com/highcharts.js"></script>  
+      <script src = "https://code.highcharts.com/modules/data.js"></script>
+    </head>
+
+   <body>
+        <div id = "container" style = "width: 1000px; height: 700px; margin: 0 auto"></div>
+        <script language = "JavaScript">
+                        /*
+                The purpose of this demo is to demonstrate how multiple charts on the same page can be linked
+                through DOM and Highcharts events and API methods. It takes a standard Highcharts config with a
+                small variation for each data set, and a mouse/touch event handler to bind the charts together.
+                */
+
+                $(function() {
+
+
+                /**
+                 * In order to synchronize tooltips and crosshairs, override the 
+                 * built-in events with handlers defined on the parent element.
+                 */
+                $('#container').bind('mousemove touchmove', function(e) {
+                var chart,
+                    points,
+                    point,
+                    i,
+                    secSeriesIndex = 1;
+
+                for (i = 0; i < Highcharts.charts.length; i++) {
+                    chart = Highcharts.charts[i];
+                    e = chart.pointer.normalize(e); // Find coordinates within the chart	
+                    points = [];
+                    Highcharts.each(chart.series, function(p, i) {
+                    point = p.searchPoint(e, true)
+                    if (point)
+                        points.push(point)
+                    })
+                    if (points) {
+                    var number = 0;
+                    Highcharts.each(points, function(p, i) {
+                        if (!p.series.visible) {
+                        points.splice(i - number, 1);
+                        number++;
+                        }
+                    })
+                    if (points.length) {
+                        chart.tooltip.refresh(points); // Show the tooltip
+                        chart.xAxis[0].drawCrosshair(e, points[0]); // Show the crosshair
+                    }
+                    }
+                }
+                });
+                /**
+                 * Override the reset function, we don't need to hide the tooltips and crosshairs.
+                 */
+                Highcharts.Pointer.prototype.reset = function() {};
+
+                /**
+                 * Synchronize zooming through the setExtremes event handler.
+                 */
+                function syncExtremes(e) {
+                var thisChart = this.chart;
+
+                if (e.trigger !== 'syncExtremes') { // Prevent feedback loop
+                    Highcharts.each(Highcharts.charts, function(chart) {
+                    if (chart !== thisChart) {
+                        if (chart.xAxis[0].setExtremes) { // It is null while updating
+                        chart.xAxis[0].setExtremes(e.min, e.max, undefined, false, {
+                            trigger: 'syncExtremes'
+                        });
+                        }
+                    }
+                    });
+                }
+                }
+
+                //Links the names of the series which should hide if one or the other is hidden.
+                var links = {
+                'Chart 1 series 1': 'Chart 2 series 1',
+                'Chart 2 series 1': 'Chart 1 series 1',
+                'Chart 1 series 2': 'Chart 2 series 2',
+                'Chart 2 series 2': 'Chart 1 series 2'
+                };
+
+                // Get the data. The contents of the data file can be viewed at 
+                // https://github.com/highslide-software/highcharts.com/blob/master/samples/data/activity.json
+                //$.getJSON('http://www.highcharts.com/samples/data/jsonp.php?filename=activity.json&callback=?', function (activity) {
+
+                var activity = {
+                "xData": [1, 1056, 2161, 3215, 4267],
+
+                "datasets": [{
+                    "id": "Chart 1 series 1",
+                    "name": "Chart 1 series 1",
+                    "data": [1, 10, 20, 30, 20],
+                    "unit": "ms",
+                    "type": "line",
+                    "valueDecimals": 1
+                }, {
+                    "id": "Chart 1 series 2",
+                    "name": "Chart 1 series 2",
+                    "data": [2, 84, 22, 5, 75],
+                    "unit": "ms",
+                    "type": "line",
+                    "valueDecimals": 1
+                }, {
+                    "id": "Chart 1 series 3",
+                    "name": "Chart 1 series 3",
+                    "data": [3, 10, 20, 30, 20],
+                    "unit": "%",
+                    "type": "line",
+                    "valueDecimals": 1
+                }, {
+                    "id": "Chart 2 series 1",
+                    "name": "Chart 2 series 1",
+                    "data": [4, 56, 34, 77, 2],
+                    "unit": "%",
+                    "type": "line",
+                    "valueDecimals": 0
+                }, {
+                    "id": "Chart 2 series 2",
+                    "name": "Chart 2 series 2",
+                    "data": [4, 26, 54, 27, 2],
+                    "unit": "%",
+                    "type": "line",
+                    "valueDecimals": 0
+                }]
+                };
+
+
+                var lastChart;
+
+                $.each(activity.datasets, function(i, dataset) {
+
+                // Add X values
+                dataset.data = Highcharts.map(dataset.data, function(val, i) {
+                    return [activity.xData[i], val];
+                });
+
+                if (i % 3 == 0) { //first series of chart
+
+                    $('<div class="chart">')
+                    .appendTo('#container')
+                    .highcharts({
+                        chart: {
+                        marginLeft: 40, // Keep all charts left aligned
+                        spacingTop: 20,
+                        spacingBottom: 20,
+                        zoomType: 'x'
+                            // pinchType: null // Disable zoom on touch devices
+                        },
+                        title: {
+                        text: dataset.name.slice(0, 7),
+                        align: 'left',
+                        margin: 0,
+                        x: 30
+                        },
+                        credits: {
+                        enabled: false
+                        },
+                        legend: {
+                        enabled: true
+                        },
+                        xAxis: {
+                        crosshair: true,
+                        minRange: 0.1,
+                        events: {
+                            setExtremes: syncExtremes
+                        },
+                        labels: {
+                            format: '{value} km'
+                        }
+                        },
+                        yAxis: {
+                        title: {
+                            text: null
+                        }
+                        },
+                        tooltip: {
+                        shared: true,
+                        pointFormat: '{series.name}: {point.y}<br>',
+                        valueDecimals: dataset.valueDecimals
+                        },
+                        series: [{
+                        id: dataset.id,
+                        data: dataset.data,
+                        name: dataset.name,
+                        type: dataset.type,
+                        color: Highcharts.getOptions().colors[i],
+                        fillOpacity: 0.3,
+                        tooltip: {
+                            valueSuffix: ' ' + dataset.unit
+                        }
+                        }],
+                        plotOptions: {
+                        series: {
+                            events: {
+                            legendItemClick: function(event) {
+                                var otherChart = Highcharts.charts[(this.chart.index + 1) % 2],
+                                sisterSeries = otherChart.get(links[this.name]);
+                                if (sisterSeries._i) {
+                                if (this.visible) {
+                                    sisterSeries.hide();
+                                } else {
+                                    sisterSeries.show();
+                                }
+                                }
+                            }
+                            }
+                        }
+                        }
+                    });
+
+                } else { //second series of chart
+                    lastChart = Highcharts.charts[Highcharts.charts.length - 1];
+                    lastChart.addSeries({
+                    id: dataset.id,
+                    data: dataset.data,
+                    name: dataset.name,
+                    type: dataset.type,
+                    color: Highcharts.getOptions().colors[i],
+                    fillOpacity: 0.3,
+                    tooltip: {
+                        valueSuffix: ' ' + dataset.unit
+                    }
+                    });
+                }
+
+                });
+                //});
+                });
+
+        
+        
+        
+        
+        
+        
+        
+        
+        
+        </script>
+
+
+   </body>
+</html>

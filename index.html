@@ -5,6 +5,8 @@
        <link rel = "stylesheet" href = "main.css">
        <!-- External script-->
        <script src = "https://code.highcharts.com/highcharts.js"></script>
+       <script src = "https://ajax.googleapis.com/ajax/libs/jquery/2.1.3/jquery.min.js"></script>
+       <script src="https://code.highcharts.com/modules/data.js"></script>
    </head>
 
    <body>
@@ -18,9 +20,21 @@
        </table>
 
        <!-- Chart Table -->
-       <table class = "simpleTable">
+       <table class = "simpleTable" border = "2">
             <tr>
-                <td rowspan = "2" id = "sharedGrid">Insert Shared Grid</td>
+                <td id = "sharedGrid" width = "70%" class = "container">
+                    <table id = "sharedTable">
+                        <tr style = "height: 50%">
+                            <td id = "energyChart"></td>
+                        </tr>
+                        <tr style = "height: 30%">
+                            <td id = "priceChart"></td>
+                        </tr>
+                        <tr>
+                            <td id = "tempChart"></td>
+                        </tr>
+                    </table>
+                </td>
                 <td id = "legendGrid">Insert Legend Table</td>
             </tr>
             <tr>
