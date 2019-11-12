@@ -2,6 +2,77 @@
 
 const JSONFileName = 'https://raw.githubusercontent.com/castrojoshua18/CASTRO_A13575128_HW3/master/assets/springfield.json';
 
+//formulate how we want to make our pie chart
+
+var pieRecipe = {
+    chart: {
+        renderTo: document.getElementById('pieGrid'),
+        className: 'pieGrid',
+        type: 'pie',
+        backgroundColor: 'transparent',
+        animation: false
+    },
+    plotOptions: {
+        pie: {
+            innerSize: '50%',
+            size: '75%',
+            dataLabels: {
+                enabled: false
+            }
+        },
+        series: {
+            animation: false
+        }
+    },
+    title: {
+        align: 'center',
+        verticalAlign: 'middle',
+        text: '',
+        style: {
+            fontSize: '13px'
+        }
+    },
+    credits: {
+        enabled: false,
+    },
+    series: [{
+        name: 'Energy',
+        colorByPoint: true,
+        data: []
+    }]
+};
+
+var pieColors = {
+    'black_coal': 'Black', 
+    'distillate': 'Red', 
+    'gas_ccgt': 'Orange',
+    'hydro': 'Blue',
+    'wind': 'Green',
+    'exports': 'Purple',
+    'pumps': 'Light Blue'
+};
+
+function fillPie(idx, data) {
+    var pieFilling = data['name'].map( function (elt, fillIdx) {
+        if (data['name'] !== 'exports' & data['name'] !== 'pumps') {
+            return {
+                name: elt.split('.')[elt.split('.').length - 1],
+                y: sampledEnergy['data'][fillIdx][idx],
+                color: pieColors[elt.split('.')[elt.split('.').length - 1]]
+            }
+        }   
+    });
+    
+    pieRecipe.series[0].data = pieFilling;
+    var pieSum = 0;
+    for (var i = 0; i < pieRecipe.series[0].data.length; i++) {
+        pieSum += pieRecipe.series[0].data[i].y
+    }
+    pieRecipe.title.text = Math.round(pieSum) + ' MW';
+    Highcharts.chart(pieRecipe);
+}
+
+
 ['mouseleave'].forEach(function (eventType) {
 document.getElementById('sharedGrid').addEventListener(
     eventType,
@@ -33,7 +104,8 @@ document.getElementById('sharedGrid').addEventListener(
         var chart,
             point,
             i,
-            event;
+            event,
+            idx;
 
         for (i = 0; i < Highcharts.charts.length; i = i + 1) {
             chart = Highcharts.charts[i];
@@ -41,9 +113,11 @@ document.getElementById('sharedGrid').addEventListener(
             event = chart.pointer.normalize(e);
             // Get the hovered point
             point = chart.series[0].searchPoint(event, true);
+            idx = chart.series[0].data.indexOf( point );
 
             if (point) {
                 point.highlight(e);
+                fillPie(idx, sampledEnergy)
             }
         }
     }
@@ -85,6 +159,11 @@ if (e.trigger !== 'syncExtremes') { // Prevent feedback loop
     }
 }
 
+//holder for sampledEnergy (energy data at 30 min intervals)
+var sampledEnergy = {
+    name: [],
+    data: []
+};
 
 /* Add this to the xAxis attribute of each chart. */
 events: {
@@ -106,15 +185,17 @@ Highcharts.ajax({
         }
 
         //sample the data
-        var sampled = new Array();
         for (var i = 0; i < 7; i++) {
-            var temp_data = activity[i].history.data;
+            var temp_data = activity[i];
             var to_sample = new Array();
             for (var j = 0; j < 2016; j += 6) {
-                to_sample.push(temp_data.slice(j,j+6).reduce(calcSum,0))
+                to_sample.push(temp_data.history.data.slice(j,j+6).reduce(calcSum,0))
             }
-            sampled.push(to_sample)
+            sampledEnergy.name.push(temp_data.fuel_tech)
+            sampledEnergy.data.push(to_sample)
         }
+
+
 
         //attach a div to the location of the energy chart in the html file
         var energyChartDiv = document.createElement('div');
@@ -168,7 +249,7 @@ Highcharts.ajax({
                   zIndex: 3
                 }],
 
-                enabled: false
+                enabled: true
               },
 
             plotOptions: {
@@ -202,7 +283,7 @@ Highcharts.ajax({
                     name: "Wind",
                     pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
                     pointInterval: 1800000/5,
-                    data: sampled[5],
+                    data: sampledEnergy.data[5],
                     color: 'Green'
                 
                 },
@@ -210,28 +291,28 @@ Highcharts.ajax({
                     name: "Hydro",
                     pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
                     pointInterval: 1800000/5,
-                    data: sampled[3],
+                    data: sampledEnergy.data[3],
                     color: 'Blue'
                 }, 
                 {
                     name: "Gas (CCGT)",
                     pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
                     pointInterval: 1800000/5,
-                    data: sampled[2],
+                    data: sampledEnergy.data[2],
                     color: 'Orange'
                 },
                 {
                     name: 'Distillate',
                     pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
                     pointInterval: 1800000/5,
-                    data: sampled[1],
+                    data: sampledEnergy.data[1],
                     color: 'Red'
                 }, 
                 {
                     name: "Black Coal",
                     pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
                     pointInterval: 1800000/5,
-                    data: sampled[0],
+                    data: sampledEnergy.data[0],
                     color: 'Black'
                 }
             ]
@@ -293,7 +374,7 @@ Highcharts.ajax({
                   zIndex: 3
                 }],
 
-                enabled: false
+                enabled: true
               },
 
             credits: {
@@ -305,7 +386,7 @@ Highcharts.ajax({
                 name: "Price",
                 pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
                 pointInterval: 1800000/5,
-                step: 'right',
+                step: 'left',
                 data: activity[8].history.data,
                 color: 'Red'
             }
@@ -372,7 +453,8 @@ Highcharts.ajax({
                   zIndex: 3
                 }],
 
-                enabled: false
+                enabled: false,
+                snap: 100
               },
         
             series: [
