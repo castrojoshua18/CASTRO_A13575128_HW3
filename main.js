@@ -6,7 +6,7 @@ const JSONFileName = 'https://raw.githubusercontent.com/castrojoshua18/CASTRO_A1
 
 var pieRecipe = {
     chart: {
-        renderTo: document.getElementById('toggleGrid'),
+        renderTo: 'toggleGrid',
         className: 'toggleGrid',
         type: 'pie',
         backgroundColor: 'transparent',
@@ -90,6 +90,8 @@ var dynamicColors = {
     'pumps': 'Light Blue'
 };
 
+var toggleGrid;
+
 function fillPie(idx, data) {
     var pieFilling = data['name'].map( function (elt, fillIdx) {
         if (data['name'] !== 'exports' & data['name'] !== 'pumps') {
@@ -107,7 +109,7 @@ function fillPie(idx, data) {
         pieSum += pieRecipe.series[0].data[i].y
     }
     pieRecipe.title.text = Math.round(pieSum) + ' MW';
-    Highcharts.chart(pieRecipe);
+    toggleGrid = Highcharts.chart(pieRecipe);
 }
 
 
@@ -217,17 +219,12 @@ Highcharts.ajax({
         //read in the data
         activity = JSON.parse(activity);
 
-        //helper function for sampling; gets the sum of an array
-        function calcSum(sum, to_add) {
-            return sum + to_add
-        }
-
         //sample the data
         for (var i = 0; i < 7; i++) {
             var temp_data = activity[i];
             var to_sample = new Array();
             for (var j = 0; j < 2016; j += 6) {
-                to_sample.push(temp_data.history.data.slice(j,j+6).reduce(calcSum,0))
+                to_sample.push(temp_data.history.data[j])
             }
             sampledEnergy.name.push(temp_data.fuel_tech)
             sampledEnergy.data.push(to_sample)
@@ -507,8 +504,7 @@ Highcharts.ajax({
         fillPie(0,sampledEnergy);
 
         $('#btnPie').click(function() {
-            var toUpdate = document.getElementById('toggleFrid');
-            toUpdate.update({
+            toggleGrid.update({
                 chart: {
                     type: 'pie',
                 },
@@ -530,16 +526,18 @@ Highcharts.ajax({
                     text: '',
                     style: {
                         fontSize: '13px'
-                    }
+                    },
+                    enabled: true,
                 },
             })
-            console.log(toUpdate)
         }
         )
 
         $('#btnTable').click(function() {
-            var toUpdate = document.getElementById('toggleGrid');
-            toUpdate.update({
+            toggleGrid.update({
+                chart: {
+                    type: 'bar',
+                },
                 plotOptions: {
                     bar: {
                         dataLabels: {
@@ -547,16 +545,27 @@ Highcharts.ajax({
                         }
                     }
                 },
+                xAxis: {
+                    title: {
+                        enabled: false
+                    }
+                },
+                yAxis: {
+                    title: {
+                        enabled: false
+                    }
+                },
                 legend: {
                         enabled: false,
                 },
                 title: {
-                    align: 'top',
-                    verticalAlign: 'middle',
+                    align: 'right',
+                    verticalAlign: 'bottom',
                     text: '',
                     style: {
                         fontSize: '13px'
-                    }
+                    },
+                    enabled: false,
                 },
             })
         }
