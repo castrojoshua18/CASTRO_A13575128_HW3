@@ -232,6 +232,8 @@ Highcharts.ajax({
             sampledEnergy.name.push(temp_data.fuel_tech)
             sampledEnergy.data.push(to_sample)
         }
+        sampledEnergy.name = sampledEnergy.name.reverse()
+        sampledEnergy.data = sampledEnergy.data.reverse()
 
         //attach a div to the location of the energy chart in the html file
         var energyChartDiv = document.createElement('div');
@@ -319,7 +321,7 @@ Highcharts.ajax({
                     name: "Wind",
                     pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
                     pointInterval: 1800000/5,
-                    data: sampledEnergy.data[4],
+                    data: sampledEnergy.data[0],
                     color: 'Green'
                 
                 },
@@ -327,7 +329,7 @@ Highcharts.ajax({
                     name: "Hydro",
                     pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
                     pointInterval: 1800000/5,
-                    data: sampledEnergy.data[3],
+                    data: sampledEnergy.data[1],
                     color: 'Blue'
                 }, 
                 {
@@ -341,14 +343,14 @@ Highcharts.ajax({
                     name: 'Distillate',
                     pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
                     pointInterval: 1800000/5,
-                    data: sampledEnergy.data[1],
+                    data: sampledEnergy.data[3],
                     color: 'Red'
                 }, 
                 {
                     name: "Black Coal",
                     pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
                     pointInterval: 1800000/5,
-                    data: sampledEnergy.data[0],
+                    data: sampledEnergy.data[4],
                     color: 'Black'
                 }
             ]
