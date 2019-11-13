@@ -6,8 +6,8 @@ const JSONFileName = 'https://raw.githubusercontent.com/castrojoshua18/CASTRO_A1
 
 var pieRecipe = {
     chart: {
-        renderTo: document.getElementById('pieGrid'),
-        className: 'pieGrid',
+        renderTo: document.getElementById('toggleGrid'),
+        className: 'toggleGrid',
         type: 'pie',
         backgroundColor: 'transparent',
         animation: false
@@ -42,7 +42,45 @@ var pieRecipe = {
     }]
 };
 
-var pieColors = {
+var pieRecipe = {
+    chart: {
+        renderTo: document.getElementById('toggleGrid'),
+        className: 'toggleGrid',
+        type: 'pie',
+        backgroundColor: 'transparent',
+        animation: false
+    },
+    plotOptions: {
+        pie: {
+            innerSize: '50%',
+            size: '75%',
+            dataLabels: {
+                enabled: false
+            }
+        },
+        series: {
+            animation: false
+        }
+    },
+    title: {
+        align: 'center',
+        verticalAlign: 'middle',
+        text: '',
+        style: {
+            fontSize: '13px'
+        }
+    },
+    credits: {
+        enabled: false,
+    },
+    series: [{
+        name: 'Energy',
+        colorByPoint: true,
+        data: []
+    }]
+};
+
+var dynamicColors = {
     'black_coal': 'Black', 
     'distillate': 'Red', 
     'gas_ccgt': 'Orange',
@@ -58,7 +96,7 @@ function fillPie(idx, data) {
             return {
                 name: elt.split('.')[elt.split('.').length - 1],
                 y: sampledEnergy['data'][fillIdx][idx],
-                color: pieColors[elt.split('.')[elt.split('.').length - 1]]
+                color: dynamicColors[elt.split('.')[elt.split('.').length - 1]]
             }
         }   
     });
@@ -170,7 +208,7 @@ events: {
         setExtremes: syncExtremes
     }
 
-// Get the data. The contents of the data file can be viewed at
+// Get the data
 Highcharts.ajax({
     url: JSONFileName,
     dataType: 'text',
@@ -194,8 +232,6 @@ Highcharts.ajax({
             sampledEnergy.name.push(temp_data.fuel_tech)
             sampledEnergy.data.push(to_sample)
         }
-
-
 
         //attach a div to the location of the energy chart in the html file
         var energyChartDiv = document.createElement('div');
@@ -393,12 +429,12 @@ Highcharts.ajax({
             ],
         });
 
-        //make price chart div to hold chart
+        //make temp chart div to hold chart
         var tempChartDiv = document.createElement('div');
         tempChartDiv.className = 'sharedChartSmall';
         document.getElementById('tempChart').appendChild(tempChartDiv);
         
-
+        //make temp chart
         Highcharts.chart(tempChartDiv, {
             chart:{
                 type: 'line',
@@ -467,5 +503,63 @@ Highcharts.ajax({
             }
             ],
         });
+
+        fillPie(0,sampledEnergy);
+
+        $('#btnPie').click(function() {
+            var toUpdate = document.getElementById('toggleFrid');
+            toUpdate.update({
+                chart: {
+                    type: 'pie',
+                },
+                plotOptions: {
+                    pie: {
+                        innerSize: '50%',
+                        size: '75%',
+                        dataLabels: {
+                            enabled: false
+                        }
+                    },
+                    series: {
+                        animation: false
+                    }
+                },
+                title: {
+                    align: 'center',
+                    verticalAlign: 'middle',
+                    text: '',
+                    style: {
+                        fontSize: '13px'
+                    }
+                },
+            })
+            console.log(toUpdate)
+        }
+        )
+
+        $('#btnTable').click(function() {
+            var toUpdate = document.getElementById('toggleGrid');
+            toUpdate.update({
+                plotOptions: {
+                    bar: {
+                        dataLabels: {
+                            enabled: true
+                        }
+                    }
+                },
+                legend: {
+                        enabled: false,
+                },
+                title: {
+                    align: 'top',
+                    verticalAlign: 'middle',
+                    text: '',
+                    style: {
+                        fontSize: '13px'
+                    }
+                },
+            })
+        }
+        )
     }
 });
