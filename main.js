@@ -94,7 +94,7 @@ var toggleGrid;
 
 function fillPie(idx, data) {
     var pieFilling = data['name'].map( function (elt, fillIdx) {
-        if (data['name'] !== 'exports' & data['name'] !== 'pumps') {
+        if (data.name !== "exports" & data.name !== "pumps") {
             return {
                 name: elt.split('.')[elt.split('.').length - 1],
                 y: sampledEnergy['data'][fillIdx][idx],
@@ -220,7 +220,10 @@ Highcharts.ajax({
         activity = JSON.parse(activity);
 
         //sample the data
-        for (var i = 0; i < 7; i++) {
+        for (var i = 0; i < 6; i++) {
+            if (i == 4) {
+                continue;
+            }
             var temp_data = activity[i];
             var to_sample = new Array();
             for (var j = 0; j < 2016; j += 6) {
@@ -316,7 +319,7 @@ Highcharts.ajax({
                     name: "Wind",
                     pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
                     pointInterval: 1800000/5,
-                    data: sampledEnergy.data[5],
+                    data: sampledEnergy.data[4],
                     color: 'Green'
                 
                 },
