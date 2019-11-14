@@ -21,9 +21,9 @@ There are certain functionality and aesthetic details that could be improved. Th
 * Add lines to the legend so that it is easier to consume from right to left
 
 ## Citations
-* [Highcharts Area Chart reference] (https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/area-basic/)
-* [Highcharts Line Chart reference] (https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/line-basic/)
-* [Highcharts Pie Chart reference] (https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/pie-basic/)
-* [Highcharts Bar Chart reference] (https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/bar-basic/)
-* [Highcharts Synchronised Charts reference] (https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/synchronized-charts/)
-* [Markdown Tutorial] (https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet)
+* Highcharts Area Chart reference https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/area-basic/
+* Highcharts Line Chart reference https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/line-basic/
+* Highcharts Pie Chart reference https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/pie-basic/
+* Highcharts Bar Chart reference https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/bar-basic/
+* Highcharts Synchronised Charts reference https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/synchronized-charts/
+* Markdown Tutorial https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
