@@ -20,7 +20,7 @@ There are certain functionality and aesthetic details that could be improved. Th
 * Button placement to be moved in between the toggle-chart and the legend
 * Add lines to the legend so that it is easier to consume from right to left
 
-### Citations
+## Citations
 * [Highcharts Area Chart reference] (https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/area-basic/)
 * [Highcharts Line Chart reference] (https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/line-basic/)
 * [Highcharts Pie Chart reference] (https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/pie-basic/)
