@@ -53,7 +53,7 @@ body {
     width:70%; 
 }
 
-#toggleGrid {
+.pieGrid {
     width:300px;
     height:300px;
     font-family: "IBM Plex Serif", Georgia, 'Times New Roman', Times, serif;
@@ -65,4 +65,8 @@ body {
 
 .pageLogo {
     height: 75px;
+}
+
+.bold {
+    font-weight: bold;
 }

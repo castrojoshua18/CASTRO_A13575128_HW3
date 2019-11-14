@@ -32,6 +32,12 @@ var pieRecipe = {
             fontSize: '13px'
         }
     },
+    xAxis: {
+        visible: false,
+    },
+    yAxis: {
+        visible: false,
+    },
     credits: {
         enabled: false,
     },
@@ -90,7 +96,10 @@ var dynamicColors = {
     'pumps': 'Light Blue'
 };
 
+//holders for toggle grid and sum of pie/bar data
 var toggleGrid;
+var pieSum;
+var loadSum=0;
 
 function fillPie(idx, data) {
     var pieFilling = data['name'].map( function (elt, fillIdx) {
@@ -100,17 +109,66 @@ function fillPie(idx, data) {
                 y: sampledEnergy['data'][fillIdx][idx],
                 color: dynamicColors[elt.split('.')[elt.split('.').length - 1]]
             }
-        }   
+        }  
     });
-    
+
+    pieSum=0;
     pieRecipe.series[0].data = pieFilling;
-    var pieSum = 0;
     for (var i = 0; i < pieRecipe.series[0].data.length; i++) {
         pieSum += pieRecipe.series[0].data[i].y
     }
     pieRecipe.title.text = Math.round(pieSum) + ' MW';
     toggleGrid = Highcharts.chart(pieRecipe);
+    
 }
+//holder for current price
+var currPrice;
+//function to get the total load energy data
+function getLegendInfo(idx) {
+    loadSum = 0
+    for (var i = 0; i < 2; i++) {
+        loadSum += nonPowerData['data'][i][idx];
+    }
+    currPrice = nonPowerData['data'][2][idx];
+}
+
+function updateLegend(idx) {
+    //get the necessary info
+    getLegendInfo(idx);
+    var totalPower = pieSum + loadSum;
+    //row 1 info
+    document.getElementById("sourceTotal").innerHTML = pieSum.toFixed(2);
+    document.getElementById('avPrice').innerHTML = currPrice.toFixed(2);
+    //row 2 info
+    document.getElementById("windPower").innerHTML = sampledEnergy.data[0][idx].toFixed(2)
+    document.getElementById("windCont").innerHTML = ((sampledEnergy.data[0][idx] / totalPower) * 100).toFixed(2) + "%"
+    //row 3 info
+    document.getElementById("hydPower").innerHTML = sampledEnergy.data[1][idx].toFixed(2)
+    document.getElementById("hydCont").innerHTML = ((sampledEnergy.data[1][idx] / totalPower) * 100).toFixed(2) + "%"
+    //row 4 info
+    document.getElementById("gasPower").innerHTML = sampledEnergy.data[2][idx].toFixed(2)
+    document.getElementById("gasCont").innerHTML = ((sampledEnergy.data[2][idx] / totalPower) * 100).toFixed(2) + "%"
+    //row 5
+    document.getElementById("distPower").innerHTML = sampledEnergy.data[3][idx].toFixed(2)
+    document.getElementById("distCont").innerHTML = ((sampledEnergy.data[3][idx] / totalPower) * 100).toFixed(2) + "%"
+    //row 6
+    document.getElementById("coalPower").innerHTML = sampledEnergy.data[4][idx].toFixed(2)
+    document.getElementById("coalCont").innerHTML = ((sampledEnergy.data[4][idx] / totalPower) * 100).toFixed(2) + "%"
+    //row 7
+    document.getElementById("loadPower").innerHTML = loadSum.toFixed(2);
+    //row 8
+    document.getElementById("expPower").innerHTML = nonPowerData.data[1][idx].toFixed(2)
+    document.getElementById("expCont").innerHTML = ((nonPowerData.data[1][idx] / totalPower) * 100).toFixed(2) + "%"
+    //row 9
+    document.getElementById("pmPower").innerHTML = nonPowerData.data[0][idx].toFixed(2)
+    document.getElementById("pmCont").innerHTML = ((nonPowerData.data[0][idx] / totalPower) * 100).toFixed(2) + "%"
+    //row 10
+    document.getElementById("netPower").innerHTML = totalPower.toFixed(2)
+    //row 11
+    var renewables = (((sampledEnergy.data[0][idx] / totalPower) + (sampledEnergy.data[1][idx] / totalPower)) * 100)
+    document.getElementById("renCont").innerHTML = renewables.toFixed(2) + "%"
+}
+
 
 
 ['mouseleave'].forEach(function (eventType) {
@@ -157,7 +215,8 @@ document.getElementById('sharedGrid').addEventListener(
 
             if (point) {
                 point.highlight(e);
-                fillPie(idx, sampledEnergy)
+                fillPie(idx, sampledEnergy);
+                updateLegend(idx);
             }
         }
     }
@@ -205,6 +264,12 @@ var sampledEnergy = {
     data: []
 };
 
+var nonPowerData = {
+    name: [],
+    data:[]
+}
+var fullData;
+
 /* Add this to the xAxis attribute of each chart. */
 events: {
         setExtremes: syncExtremes
@@ -218,6 +283,7 @@ Highcharts.ajax({
 
         //read in the data
         activity = JSON.parse(activity);
+        fullData = activity;
 
         //sample the data
         for (var i = 0; i < 6; i++) {
@@ -226,14 +292,44 @@ Highcharts.ajax({
             }
             var temp_data = activity[i];
             var to_sample = new Array();
-            for (var j = 0; j < 2016; j += 6) {
-                to_sample.push(temp_data.history.data[j])
+            for (var j = 1; j < 2016; j = j + 6) {
+                to_sample.push(temp_data.history.data[j]);
             }
-            sampledEnergy.name.push(temp_data.fuel_tech)
-            sampledEnergy.data.push(to_sample)
+            console.log(to_sample)
+            sampledEnergy.name.push(temp_data.fuel_tech);
+            sampledEnergy.data.push(to_sample);
         }
-        sampledEnergy.name = sampledEnergy.name.reverse()
-        sampledEnergy.data = sampledEnergy.data.reverse()
+        sampledEnergy.name = sampledEnergy.name.reverse();
+        sampledEnergy.data = sampledEnergy.data.reverse();
+
+        //get the rest of the data
+        for (var i = 4; i < 11; i = i + 1) {
+            var temp_data = activity[i];
+            var to_sample = new Array();
+            
+            if (i == 5 || i == 7) {
+                continue;
+            }
+            if (temp_data.history.data.length== 2016) {
+                for (var j = 0; j < 2016; j = j + 6) {
+                    to_sample.push(temp_data.history.data[j]);
+                }
+                if (i == 9) {
+                    nonPowerData.name.push(temp_data.type);
+                }
+                else {
+                    nonPowerData.name.push(temp_data.fuel_tech);
+                }
+                nonPowerData.data.push(to_sample);
+            }
+            else {
+                for (var j = 0; j < temp_data.history.data.length; j++) {
+                    to_sample.push(temp_data.history.data[j]);
+                }
+                nonPowerData.name.push(temp_data.type);
+                nonPowerData.data.push(to_sample);
+            }
+        }
 
         //attach a div to the location of the energy chart in the html file
         var energyChartDiv = document.createElement('div');
@@ -255,14 +351,7 @@ Highcharts.ajax({
             },
             xAxis: {
                 type: 'datetime',
-                dateTimeLabelFormats: {
-                day: '%e. %b',
-                month: '%b \'%y',
-                },
-                tickInterval: 86400000/300000/6,
-                title: {
-                    enabled: false
-                }
+                tickInterval: 24 * 3600 * 1000
             },
 
             yAxis: {
@@ -286,6 +375,8 @@ Highcharts.ajax({
                   color: 'red',
                   zIndex: 3
                 }],
+
+                snap:50,
 
                 enabled: true
               },
@@ -319,37 +410,37 @@ Highcharts.ajax({
             series: [ //JSON DATA FOR USAGE HERE
                 {
                     name: "Wind",
-                    pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
-                    pointInterval: 1800000/5,
+                    pointStart: (activity[4].history.start + 5 * 60)*1000,
+                    pointInterval: 1000 * 60 * 30,
                     data: sampledEnergy.data[0],
                     color: 'Green'
                 
                 },
                 {
                     name: "Hydro",
-                    pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
-                    pointInterval: 1800000/5,
+                    pointStart: (activity[3].history.start + 5 * 60)*1000,
+                    pointInterval: 1000 * 60 * 30,
                     data: sampledEnergy.data[1],
                     color: 'Blue'
                 }, 
                 {
                     name: "Gas (CCGT)",
-                    pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
-                    pointInterval: 1800000/5,
+                    pointStart: (activity[2].history.start + 5 * 60)*1000,
+                    pointInterval: 1000 * 60 * 30,
                     data: sampledEnergy.data[2],
                     color: 'Orange'
                 },
                 {
                     name: 'Distillate',
-                    pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
-                    pointInterval: 1800000/5,
+                    pointStart: (activity[1].history.start + 5 * 60)*1000,
+                    pointInterval: 1000 * 60 * 30,
                     data: sampledEnergy.data[3],
                     color: 'Red'
                 }, 
                 {
                     name: "Black Coal",
-                    pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
-                    pointInterval: 1800000/5,
+                    pointStart: (activity[0].history.start + 5 * 60)*1000,
+                    pointInterval: 1000 * 60 * 30,
                     data: sampledEnergy.data[4],
                     color: 'Black'
                 }
@@ -376,14 +467,7 @@ Highcharts.ajax({
             },
             xAxis: {
                 type: 'datetime',
-                dateTimeLabelFormats: {
-                day: '%e. %b',
-                month: '%b \'%y',
-                },
-                tickInterval: 86400000/300000/6,
-                title: {
-                    enabled: false
-                }
+                tickInterval: 24 * 3600 * 1000
             },
 
             yAxis: {
@@ -411,9 +495,9 @@ Highcharts.ajax({
                   color: 'red',
                   zIndex: 3
                 }],
-
-                enabled: true
-              },
+                enabled: true,
+                snap:50,
+            },
 
             credits: {
                 enabled: false
@@ -422,8 +506,8 @@ Highcharts.ajax({
             series: [
             {
                 name: "Price",
-                pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
-                pointInterval: 1800000/5,
+                pointStart: (activity[8].history.start + 5 * 60)*1000,
+                    pointInterval: 1000 * 60 * 30,
                 step: 'left',
                 data: activity[8].history.data,
                 color: 'Red'
@@ -451,14 +535,7 @@ Highcharts.ajax({
             },
             xAxis: {
                 type: 'datetime',
-                dateTimeLabelFormats: {
-                day: '%e. %b',
-                month: '%b \'%y',
-                },
-                tickInterval: 86400000/300000/6,
-                title: {
-                    enabled: false
-                }
+                tickInterval: 24 * 3600 * 1000
             },
 
             yAxis: {
@@ -491,22 +568,24 @@ Highcharts.ajax({
                   zIndex: 3
                 }],
 
-                enabled: false,
-                snap: 100
+                enabled: true,
+                snap: 50,
               },
         
             series: [
             {
                 name: "Temperature",
-                pointStart: Date.UTC(2019, 0, 0, 0, 0, 1571579700, 0),
-                pointInterval: 1800000/5,
+                pointStart: (activity[10].history.start + 5 * 60)*1000,
+                    pointInterval: 1000 * 60 * 30,
                 data: activity[10].history.data,
                 color: 'Red'
             }
             ],
         });
 
+        //initialize functions to load in initial data on success
         fillPie(0,sampledEnergy);
+        updateLegend(0);
 
         $('#btnPie').click(function() {
             toggleGrid.update({
@@ -551,14 +630,10 @@ Highcharts.ajax({
                     }
                 },
                 xAxis: {
-                    title: {
-                        enabled: false
-                    }
+                    visible: false,
                 },
                 yAxis: {
-                    title: {
-                        enabled: false
-                    }
+                    visible: false,
                 },
                 legend: {
                         enabled: false,
@@ -575,5 +650,7 @@ Highcharts.ajax({
             })
         }
         )
+
+
     }
 });
