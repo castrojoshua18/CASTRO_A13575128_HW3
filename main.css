@@ -31,7 +31,7 @@ body {
 
 .simpleTable {
     width: 90%;
-    margin-left: 5%;
+    margin-left: 2%;
     margin-bottom: 10px;
     margin-top: 10px;
     font-family: "IBM Plex Serif", Georgia, 'Times New Roman', Times, serif;
@@ -69,4 +69,9 @@ body {
 
 .bold {
     font-weight: bold;
+}
+
+.masterDate {
+    font-weight: bold;
+    text-align: right;
 }

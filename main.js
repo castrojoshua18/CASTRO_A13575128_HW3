@@ -2,8 +2,11 @@
 
 const JSONFileName = 'https://raw.githubusercontent.com/castrojoshua18/CASTRO_A13575128_HW3/master/assets/springfield.json';
 
-//formulate how we want to make our pie chart
+//holder for the current datetime
+var currDT;
+var dateEntry;
 
+//formulate how we want to make our pie chart
 var pieRecipe = {
     chart: {
         renderTo: 'toggleGrid',
@@ -121,8 +124,9 @@ function fillPie(idx, data) {
     toggleGrid = Highcharts.chart(pieRecipe);
     
 }
-//holder for current price
+//holder for current price and temp
 var currPrice;
+var currTemp;
 //function to get the total load energy data
 function getLegendInfo(idx) {
     loadSum = 0
@@ -130,15 +134,18 @@ function getLegendInfo(idx) {
         loadSum += nonPowerData['data'][i][idx];
     }
     currPrice = nonPowerData['data'][2][idx];
+    currTemp = nonPowerData['data'][4][idx]
+
 }
 
+var totalPower; 
 function updateLegend(idx) {
     //get the necessary info
     getLegendInfo(idx);
-    var totalPower = pieSum + loadSum;
+    totalPower = pieSum + loadSum;
     //row 1 info
     document.getElementById("sourceTotal").innerHTML = pieSum.toFixed(2);
-    document.getElementById('avPrice').innerHTML = currPrice.toFixed(2);
+    document.getElementById('avPrice').innerHTML = "$"+ currPrice.toFixed(2);
     //row 2 info
     document.getElementById("windPower").innerHTML = sampledEnergy.data[0][idx].toFixed(2)
     document.getElementById("windCont").innerHTML = ((sampledEnergy.data[0][idx] / totalPower) * 100).toFixed(2) + "%"
@@ -169,6 +176,12 @@ function updateLegend(idx) {
     document.getElementById("renCont").innerHTML = renewables.toFixed(2) + "%"
 }
 
+
+function getCurrDT(idx) {
+    var start = (1571579700+ 5 * 60)*1000
+    currDT= start + (idx*5 * 60000)
+    dateEntry = Highcharts.dateFormat('%d %a %I:%M %p', currDT)
+}
 
 
 ['mouseleave'].forEach(function (eventType) {
@@ -217,6 +230,7 @@ document.getElementById('sharedGrid').addEventListener(
                 point.highlight(e);
                 fillPie(idx, sampledEnergy);
                 updateLegend(idx);
+                getCurrDT(idx);
             }
         }
     }
@@ -273,7 +287,8 @@ var fullData;
 /* Add this to the xAxis attribute of each chart. */
 events: {
         setExtremes: syncExtremes
-    }
+}
+
 
 // Get the data
 Highcharts.ajax({
@@ -295,7 +310,6 @@ Highcharts.ajax({
             for (var j = 1; j < 2016; j = j + 6) {
                 to_sample.push(temp_data.history.data[j]);
             }
-            console.log(to_sample)
             sampledEnergy.name.push(temp_data.fuel_tech);
             sampledEnergy.data.push(to_sample);
         }
@@ -375,9 +389,16 @@ Highcharts.ajax({
                   color: 'red',
                   zIndex: 3
                 }],
-
+                positioner : function () {
+                    return {x : this.chart.chartWidth - this.label.width-20 , y : 10}
+                },
+                formatter: function () {
+                    // var dateEntry = Highcharts.dateFormat('%d %a %I:%M %p', currDT)
+                    return '<b>' + dateEntry + '</b> Total : <b>' + totalPower.toFixed(0) +" MW </b>" 
+                },
+                borderColor: "black",
+                shape:'rect',
                 snap:50,
-
                 enabled: true
               },
 
@@ -451,7 +472,6 @@ Highcharts.ajax({
         var priceChartDiv = document.createElement('div');
         priceChartDiv.className = 'sharedChartMedium';
         document.getElementById('priceChart').appendChild(priceChartDiv);
-        
 
         Highcharts.chart(priceChartDiv, {
             chart:{
@@ -467,7 +487,7 @@ Highcharts.ajax({
             },
             xAxis: {
                 type: 'datetime',
-                tickInterval: 24 * 3600 * 1000
+                tickInterval: 24 * 3600 * 1000,
             },
 
             yAxis: {
@@ -491,13 +511,22 @@ Highcharts.ajax({
 
             tooltip: {
                 crosshairs: [{
-                  width: 2,
-                  color: 'red',
-                  zIndex: 3
-                }],
-                enabled: true,
-                snap:50,
-            },
+                    width: 2,
+                    color: 'red',
+                    zIndex: 3
+                  }],
+                  positioner : function () {
+                      return {x : this.chart.chartWidth - this.label.width-20 , y : 10}
+                  },
+                  formatter: function () {
+                      // var dateEntry = Highcharts.dateFormat('%d %a %I:%M %p', currDT)
+                      return '<b>' + dateEntry + '</b> Total : <b> $' + currPrice +" </b>" 
+                  },
+                  borderColor: "black",
+                  shape:'rect',
+                  snap:50,
+                  enabled: true
+              },
 
             credits: {
                 enabled: false
@@ -563,13 +592,21 @@ Highcharts.ajax({
 
             tooltip: {
                 crosshairs: [{
-                  width: 2,
-                  color: 'red',
-                  zIndex: 3
-                }],
-
-                enabled: true,
-                snap: 50,
+                    width: 2,
+                    color: 'red',
+                    zIndex: 3
+                  }],
+                  positioner : function () {
+                      return {x : this.chart.chartWidth - this.label.width-20 , y : 10}
+                  },
+                  formatter: function () {
+                      // var dateEntry = Highcharts.dateFormat('%d %a %I:%M %p', currDT)
+                      return '<b>' + dateEntry + '</b> Total : <b>' + currTemp +" ºF </b>" 
+                  },
+                  borderColor: "black",
+                  shape:'rect',
+                  snap:50,
+                  enabled: true
               },
         
             series: [
