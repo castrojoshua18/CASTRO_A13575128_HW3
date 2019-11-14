@@ -27,3 +27,4 @@ There are certain functionality and aesthetic details that could be improved. Th
 * Highcharts Bar Chart reference https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/bar-basic/
 * Highcharts Synchronised Charts reference https://jsfiddle.net/gh/get/library/pure/highcharts/highcharts/tree/master/samples/highcharts/demo/synchronized-charts/
 * Markdown Tutorial https://github.com/adam-p/markdown-here/wiki/Markdown-Cheatsheet
+* Color Block Reference https://stackoverflow.com/questions/11226126/how-can-i-create-a-small-color-box-using-html-and-css/11226586

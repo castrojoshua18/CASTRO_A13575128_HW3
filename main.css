@@ -28,6 +28,23 @@ body {
     font-family: "IBM Plex Serif", Georgia, 'Times New Roman', Times, serif;
 }
 
+#legendTable {
+    border-collapse: collapse;
+    border: 1px solid grey;
+    border-top: 2px solid black;
+    border-bottom: 2px solid black;
+    border-left: 0px;
+    border-right:0px;
+    text-align: right;
+}
+
+#legendTable td {
+    margin-left: 10px;
+    margin-right: 10px;
+    padding-left: 10px;
+}
+
+
 
 .simpleTable {
     width: 90%;
@@ -59,6 +76,42 @@ body {
     font-family: "IBM Plex Serif", Georgia, 'Times New Roman', Times, serif;
 }
 
+.colBlock {
+    float: left;
+    width: 5px;
+    height: 5px;
+    margin-top: 5px;
+    margin-right: 2px;
+    border: 1px solid rgba(0, 0, 0, .2);
+  }
+  
+.green {
+    background: green;
+}
+
+.orange {
+    background: orange;
+}
+
+.blue {
+    background: blue;
+}
+
+.black {
+    background: black;
+}
+
+.bbblue {
+    background: lightblue;
+}
+
+.purple {
+    background: purple;
+}
+
+.red {
+    background: red;
+}
 
 .button {
     background-color: transparent,
