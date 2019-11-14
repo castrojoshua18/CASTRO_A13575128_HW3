@@ -157,7 +157,7 @@ function updateLegend(idx) {
     document.getElementById("gasCont").innerHTML = ((sampledEnergy.data[2][idx] / totalPower) * 100).toFixed(2) + "%"
     //row 5
     document.getElementById("distPower").innerHTML = sampledEnergy.data[3][idx].toFixed(2)
-    document.getElementById("distCont").innerHTML = ((sampledEnergy.data[3][idx] / totalPower) * 100).toFixed(2) + "%"
+    document.getElementById("distCont").innerHTML = ((sampledEnergy.data[3][idx] / totalPower) * 100).toFixed(4) + "%"
     //row 6
     document.getElementById("coalPower").innerHTML = sampledEnergy.data[4][idx].toFixed(2)
     document.getElementById("coalCont").innerHTML = ((sampledEnergy.data[4][idx] / totalPower) * 100).toFixed(2) + "%"
@@ -357,14 +357,26 @@ Highcharts.ajax({
                 backgroundColor: 'transparent'
             },
 
-            title:{
-                text: 'Generation (MW)'   
+            title: {
+                text: 'Generation',
+                align: 'left',
+                style: {
+                    fontSize: '15px'
+                }
+            },
+    
+            subtitle: {
+                text: 'MW',
+                align: 'left'
             },
             legend: {
                 enabled: false
             },
             xAxis: {
                 type: 'datetime',
+                dateTimeLabelFormats: {
+                    day: '%a \n %d %b'
+                },
                 tickInterval: 24 * 3600 * 1000
             },
 
@@ -478,9 +490,16 @@ Highcharts.ajax({
                 type: 'line',
                 backgroundColor: 'transparent'
             },
-        
-            title:{
-                text: 'Price ($/MWh)'   
+            title: {
+                text: 'Price',
+                align: 'left',
+                style: {
+                    fontSize: '15px'
+                }
+            },
+            subtitle: {
+                text: '$',
+                align: 'left'
             },
             legend: {
                 enabled: false
@@ -488,6 +507,9 @@ Highcharts.ajax({
             xAxis: {
                 type: 'datetime',
                 tickInterval: 24 * 3600 * 1000,
+                dateTimeLabelFormats: {
+                    day: '%a \n %d %b'
+                },
             },
 
             yAxis: {
@@ -556,15 +578,27 @@ Highcharts.ajax({
                 backgroundColor: 'transparent'
             },
         
-            title:{
-                text: 'ºF'   
+            title: {
+                text: 'Temperature',
+                align: 'left',
+                style: {
+                    fontSize: '15px'
+                }
+            },
+    
+            subtitle: {
+                text: 'ºF',
+                align: 'left'
             },
             legend: {
                 enabled: false
             },
             xAxis: {
                 type: 'datetime',
-                tickInterval: 24 * 3600 * 1000
+                tickInterval: 24 * 3600 * 1000,
+                dateTimeLabelFormats: {
+                    day: '%a \n %d %b'
+                },
             },
 
             yAxis: {
@@ -601,7 +635,7 @@ Highcharts.ajax({
                   },
                   formatter: function () {
                       // var dateEntry = Highcharts.dateFormat('%d %a %I:%M %p', currDT)
-                      return '<b>' + dateEntry + '</b> Total : <b>' + currTemp +" ºF </b>" 
+                      return '<b>' + dateEntry + '</b> Total : <b>' + currTemp +"ºF </b>" 
                   },
                   borderColor: "black",
                   shape:'rect',

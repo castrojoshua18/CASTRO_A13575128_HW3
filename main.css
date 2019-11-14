@@ -33,7 +33,7 @@ body {
     width: 90%;
     margin-left: 2%;
     margin-bottom: 10px;
-    margin-top: 10px;
+    margin-top: 5px;
     font-family: "IBM Plex Serif", Georgia, 'Times New Roman', Times, serif;
 }
 
@@ -54,10 +54,11 @@ body {
 }
 
 .pieGrid {
-    width:300px;
-    height:300px;
+    width:150px;
+    height:150px;
     font-family: "IBM Plex Serif", Georgia, 'Times New Roman', Times, serif;
 }
+
 
 .button {
     background-color: transparent,
